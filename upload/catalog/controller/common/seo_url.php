@@ -72,12 +72,19 @@ class ControllerCommonSeoUrl extends Controller {
 	public function rewrite($link) {
 		$url_info = parse_url(str_replace('&amp;', '&', $link));
 
-		$url = '';
+		$url = '/'.$this->session->data['language'].'/';
 
 		$data = array();
 
 		parse_str($url_info['query'], $data);
 
+		// Load the language to add		
+	//	$this->load->model('localisation/language');
+	//	$language = $this->session->data['language'];
+// 		 $this->model_localisation_language->getLanguage( $this->session->data['language'] );
+// 		var_dump($this->session);
+// 		var_dump($language); exit;
+		
 		foreach ($data as $key => $value) {
 			if (isset($data['route'])) {
 				if (($data['route'] == 'product/product' && $key == 'product_id') || (($data['route'] == 'product/manufacturer/info' || $data['route'] == 'product/product') && $key == 'manufacturer_id') || ($data['route'] == 'information/information' && $key == 'information_id')) {

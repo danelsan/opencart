@@ -18,6 +18,19 @@ class ControllerSettingSetting extends Controller {
 				$this->model_localisation_currency->refresh();
 			}
 
+			// Send mail if testmail is setting
+			if (isset( $this->request->post['testing_mail'] ))
+			{
+				$mail = new Mail($this->config->get('config_mail'));
+				$mail->setTo($this->config->get('config_email'));
+				$mail->setFrom($this->config->get('config_email'));
+				$mail->setSender($this->config->get('config_name'));
+				$mail->setSubject("Test email");
+				$mail->setText(html_entity_decode("Test Email", ENT_QUOTES, 'UTF-8'));
+				$mail->send();
+				$this->response->redirect($this->url->link('setting/setting', 'token=' . $this->session->data['token'], 'SSL'));
+			}
+				
 			$this->session->data['success'] = $this->language->get('text_success');
 
 			$this->response->redirect($this->url->link('setting/store', 'token=' . $this->session->data['token'], 'SSL'));
@@ -153,6 +166,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_error_log'] = $this->language->get('entry_error_log');
 		$data['entry_error_filename'] = $this->language->get('entry_error_filename');
 		$data['entry_google_analytics'] = $this->language->get('entry_google_analytics');
+		$data['entry_mail_testing'] = $this->language->get('entry_mail_testing');
 
 		$data['help_geocode'] = $this->language->get('help_geocode');
 		$data['help_open'] = $this->language->get('help_open');
@@ -219,7 +233,8 @@ class ControllerSettingSetting extends Controller {
 		$data['help_encryption'] = $this->language->get('help_encryption');
 		$data['help_compression'] = $this->language->get('help_compression');
 		$data['help_google_analytics'] = $this->language->get('help_google_analytics');
-
+		$data['help_mail_testing'] = $this->language->get('help_mail_testing');
+		
 		$data['button_save'] = $this->language->get('button_save');
 		$data['button_cancel'] = $this->language->get('button_cancel');
 

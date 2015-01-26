@@ -1256,6 +1256,12 @@
             </div>
             <div class="tab-pane" id="tab-mail">
               <div class="form-group">
+          	 	<label class="col-sm-2 control-label" for="input-mail-protocol"><span data-toggle="tooltip" title="<?php echo $help_mail_testing; ?>"><?php echo $entry_mail_testing; ?></span></label> 
+                <div class="col-sm-10">   
+             		<input type="checkbox" name="testing_mail" value="0" />
+              	</div>
+           	  </div>
+              <div class="form-group">
                 <label class="col-sm-2 control-label" for="input-mail-protocol"><span data-toggle="tooltip" title="<?php echo $help_mail_protocol; ?>"><?php echo $entry_mail_protocol; ?></span></label>
                 <div class="col-sm-10">
                   <select name="config_mail[protocol]" id="input-mail-protocol" class="form-control">
@@ -1293,7 +1299,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="input-smtp-password"><?php echo $entry_smtp_password; ?></label>
                 <div class="col-sm-10">
-                  <input type="text" name="config_mail[smtp_password]" value="<?php echo $config_smtp_password; ?>" placeholder="<?php echo $entry_smtp_password; ?>" id="input-smtp-password" class="form-control" />
+                  <input type="password" name="config_mail[smtp_password]" value="<?php echo $config_smtp_password; ?>" placeholder="<?php echo $entry_smtp_password; ?>" id="input-smtp-password" class="form-control" />
                 </div>
               </div>
               <div class="form-group">

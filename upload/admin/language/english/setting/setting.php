@@ -130,6 +130,7 @@ $_['entry_error_display']              = 'Display Errors';
 $_['entry_error_log']                  = 'Log Errors';
 $_['entry_error_filename']             = 'Error Log Filename';
 $_['entry_google_analytics']           = 'Google Analytics Code';
+$_['entry_mail_testing']        	   = 'Testing Mail Sender';
 
 // Help
 $_['help_geocode']                     = 'Please enter your store location geocode manually.';
@@ -196,6 +197,7 @@ $_['help_password']                    = 'Allow forgotten password to be used fo
 $_['help_encryption']                  = 'Please provide a secret key that will be used to encrypt private information when processing orders.';
 $_['help_compression']                 = 'GZIP for more efficient transfer to requesting clients. Compression level must be between 0 - 9.';
 $_['help_google_analytics']            = 'Login to your <a href="http://www.google.com/analytics/" target="_blank"><u>Google Analytics</u></a> account and after creating your website profile copy and paste the analytics code into this field.';
+$_['help_mail_testing'] 	       	   = 'Check for a test of your configuration mail';
 
 // Error
 $_['error_warning']                    = 'Warning: Please check the form carefully for errors!';
