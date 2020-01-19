@@ -1,5 +1,5 @@
 <?php
-define('VERSION', '2.0');
+define('VERSION', '2.3.0.3_rc');
 
 define('ADMIN_USERNAME', '');
 define('ADMIN_PASSWORD', '');
@@ -30,6 +30,4 @@ define('SAGEPAY_DIRECT_VENDOR', '');
 
 // Settings for OpenBay Pro
 define('OPENBAY_EBAY_TOKEN', '');
-define('OPENBAY_EBAY_ENC1', '');
-define('OPENBAY_EBAY_ENC2', '');
 define('OPENBAY_EBAY_SECRET', '');

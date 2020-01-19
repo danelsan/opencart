@@ -1,9 +1,7 @@
 <?php
 class ModelCatalogDownload extends Model {
 	public function addDownload($data) {
-		$this->event->trigger('pre.admin.download.add', $data);
-
-		$this->db->query("INSERT INTO " . DB_PREFIX . "download SET filename = '" . $this->db->escape($data['filename']) . "', mask = '" . $this->db->escape($data['mask']) . "', date_added = NOW()");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "download SET filename = '" . $this->db->escape((string)$data['filename']) . "', mask = '" . $this->db->escape((string)$data['mask']) . "', date_added = NOW()");
 
 		$download_id = $this->db->getLastId();
 
@@ -11,32 +9,22 @@ class ModelCatalogDownload extends Model {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "download_description SET download_id = '" . (int)$download_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "'");
 		}
 
-		$this->event->trigger('post.admin.download.add', $download_id);
-
 		return $download_id;
 	}
 
 	public function editDownload($download_id, $data) {
-		$this->event->trigger('pre.admin.download.edit', $data);
-
-		$this->db->query("UPDATE " . DB_PREFIX . "download SET filename = '" . $this->db->escape($data['filename']) . "', mask = '" . $this->db->escape($data['mask']) . "' WHERE download_id = '" . (int)$download_id . "'");
+		$this->db->query("UPDATE " . DB_PREFIX . "download SET filename = '" . $this->db->escape((string)$data['filename']) . "', mask = '" . $this->db->escape((string)$data['mask']) . "' WHERE download_id = '" . (int)$download_id . "'");
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "download_description WHERE download_id = '" . (int)$download_id . "'");
 
 		foreach ($data['download_description'] as $language_id => $value) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "download_description SET download_id = '" . (int)$download_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "'");
 		}
-
-		$this->event->trigger('post.admin.download.edit', $download_id);
 	}
 
 	public function deleteDownload($download_id) {
-		$this->event->trigger('pre.admin.download.delete', $download_id);
-
 		$this->db->query("DELETE FROM " . DB_PREFIX . "download WHERE download_id = '" . (int)$download_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "download_description WHERE download_id = '" . (int)$download_id . "'");
-
-		$this->event->trigger('post.admin.download.delete', $download_id);
 	}
 
 	public function getDownload($download_id) {
@@ -49,7 +37,7 @@ class ModelCatalogDownload extends Model {
 		$sql = "SELECT * FROM " . DB_PREFIX . "download d LEFT JOIN " . DB_PREFIX . "download_description dd ON (d.download_id = dd.download_id) WHERE dd.language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
 		if (!empty($data['filter_name'])) {
-			$sql .= " AND dd.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";
+			$sql .= " AND dd.name LIKE '" . $this->db->escape((string)$data['filter_name']) . "%'";
 		}
 
 		$sort_data = array(
@@ -100,6 +88,26 @@ class ModelCatalogDownload extends Model {
 
 	public function getTotalDownloads() {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "download");
+
+		return $query->row['total'];
+	}
+
+	public function getReports($download_id, $start = 0, $limit = 10) {
+		if ($start < 0) {
+			$start = 0;
+		}
+
+		if ($limit < 1) {
+			$limit = 10;
+		}
+
+		$query = $this->db->query("SELECT ip, store_id, country, date_added FROM " . DB_PREFIX . "download_report WHERE download_id = '" . (int)$download_id . "' ORDER BY date_added ASC LIMIT " . (int)$start . "," . (int)$limit);
+
+		return $query->rows;
+	}
+
+	public function getTotalReports($download_id) {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "download_report WHERE download_id = '" . (int)$download_id . "'");
 
 		return $query->row['total'];
 	}

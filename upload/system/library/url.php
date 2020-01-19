@@ -1,29 +1,67 @@
 <?php
+/**
+ * @package   OpenCart
+ * @author    Daniel Kerr
+ * @copyright Copyright (c) 2005 - 2017, OpenCart, Ltd. (https://www.opencart.com/)
+ * @license   https://opensource.org/licenses/GPL-3.0
+ * @author    Daniel Kerr
+ * @see       https://www.opencart.com
+ */
+
+/**
+ * URL class.
+ */
 class Url {
-	private $domain;
-	private $ssl;
+	/** @var string */
+	private $url;
+	/** @var Controller[] */
 	private $rewrite = array();
 
-	public function __construct($domain, $ssl = '') {
-		$this->domain = $domain;
-		$this->ssl = $ssl;
+	/**
+	 * Constructor.
+	 *
+	 * @param string $url
+	 * @param string $ssl Depricated
+	 */
+	public function __construct($url) {
+		$this->url = $url;
 	}
 
+	/**
+	 *	Add a rewrite method to the URL system
+	 *
+	 * @param Controller $rewrite
+	 *
+	 * @return void
+	 */
 	public function addRewrite($rewrite) {
 		$this->rewrite[] = $rewrite;
 	}
 
-	public function link($route, $args = '', $secure = false) {
-		if (!$secure) {
-			$url = $this->domain;
-		} else {
-			$url = $this->ssl;
-		}
-
-		$url .= 'index.php?route=' . $route;
+	/**
+	 * Generates a URL
+	 *
+	 * @param string        $route
+	 * @param string|array	$args
+	 * @param bool			$js
+	 *
+	 * @return string
+	 */
+	public function link($route, $args = '', $js = false) {
+		$url = $this->url . 'index.php?route=' . (string)$route;
 
 		if ($args) {
-			$url .= str_replace('&', '&amp;', '&' . ltrim($args, '&'));
+			if (!$js) {
+				$amp = '&amp;';
+			} else {
+				$amp = '&';
+			}
+
+			if (is_array($args)) {
+				$url .= $amp . http_build_query($args, '', $amp);
+			} else {
+				$url .= str_replace('&', $amp, '&' . ltrim($args, '&'));
+			}
 		}
 
 		foreach ($this->rewrite as $rewrite) {

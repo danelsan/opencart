@@ -1,66 +1,69 @@
 <?php
 class ControllerCommonLanguage extends Controller {
 	public function index() {
+		//public function index(&$test) {
+		//$test = 99;
+
 		$this->load->language('common/language');
 
-		$data['text_language'] = $this->language->get('text_language');
+		$data['code'] = $this->config->get('config_language');
 
-		$data['action'] = $this->url->link('common/language/language', '', $this->request->server['HTTPS']);
+		$url_data = $this->request->get;
 
-		$data['code'] = $this->session->data['language'];
+		if (isset($url_data['route'])) {
+			$route = $url_data['route'];
+		} else {
+			$route = $this->config->get('action_default');
+		}
 
-		$this->load->model('localisation/language');
+		unset($url_data['_route_']);
+		unset($url_data['route']);
+		unset($url_data['language']);
+
+		$url = '';
+
+		if ($url_data) {
+			$url = '&' . urldecode(http_build_query($url_data));
+		}
 
 		$data['languages'] = array();
+
+		$this->load->model('localisation/language');
 
 		$results = $this->model_localisation_language->getLanguages();
 
 		foreach ($results as $result) {
 			if ($result['status']) {
 				$data['languages'][] = array(
-					'name'  => $result['name'],
-					'code'  => $result['code'],
-					'image' => $result['image']
+					'name' => $result['name'],
+					'code' => $result['code'],
+					'href' => $this->url->link('common/language/language', 'language=' . $this->config->get('config_language') . '&code=' . $result['code'] . '&redirect=' . urlencode(str_replace('&amp;', '&', $this->url->link($route, 'language=' . $result['code'] . $url))))
 				);
 			}
 		}
 
-		if (!isset($this->request->get['route'])) {
-			$data['redirect'] = $this->url->link('common/home');
-		} else {
-			$url_data = $this->request->get;
-
-			unset($url_data['_route_']);
-
-			$route = $url_data['route'];
-
-			unset($url_data['route']);
-
-			$url = '';
-
-			if ($url_data) {
-				$url = '&' . urldecode(http_build_query($url_data, '', '&'));
-			}
-
-			$data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
-		}
-
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/language.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/common/language.tpl', $data);
-		} else {
-			return $this->load->view('default/template/common/language.tpl', $data);
-		}
+		return $this->load->view('common/language', $data);
 	}
 
 	public function language() {
-		if (isset($this->request->post['code'])) {
-			$this->session->data['language'] = $this->request->post['code'];
+		if (isset($this->request->get['code'])) {
+			$code = $this->request->get['code'];
+		} else {
+			$code = $this->config->get('config_language');
 		}
 
-		if (isset($this->request->post['redirect'])) {
-			$this->response->redirect($this->request->post['redirect']);
+		if (isset($this->request->get['redirect'])) {
+			$redirect = $this->request->get['redirect'];
 		} else {
-			$this->response->redirect($this->url->link('common/home'));
+			$redirect = '';
+		}
+
+		setcookie('language', $code, time() + 60 * 60 * 24 * 30, '/', $this->request->server['HTTP_HOST']);
+
+		if ($redirect && substr($redirect, 0, strlen($this->config->get('config_url'))) == $this->config->get('config_url')) {
+			$this->response->redirect($redirect);
+		} else {
+			$this->response->redirect($this->url->link($this->config->get('action_default'), 'language=' . $code));
 		}
 	}
 }

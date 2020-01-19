@@ -1,46 +1,9 @@
 <?php
 class ModelCatalogReview extends Model {
 	public function addReview($product_id, $data) {
-		$this->event->trigger('pre.review.add', $data);
+		$this->db->query("INSERT INTO " . DB_PREFIX . "review SET author = '" . $this->db->escape((string)$data['name']) . "', customer_id = '" . (int)$this->customer->getId() . "', product_id = '" . (int)$product_id . "', text = '" . $this->db->escape((string)$data['text']) . "', rating = '" . (int)$data['rating'] . "', date_added = NOW()");
 
-		$this->db->query("INSERT INTO " . DB_PREFIX . "review SET author = '" . $this->db->escape($data['name']) . "', customer_id = '" . (int)$this->customer->getId() . "', product_id = '" . (int)$product_id . "', text = '" . $this->db->escape($data['text']) . "', rating = '" . (int)$data['rating'] . "', date_added = NOW()");
-
-		$review_id = $this->db->getLastId();
-
-		if ($this->config->get('config_review_mail')) {
-			$this->load->language('mail/review');
-			$this->load->model('catalog/product');
-			$product_info = $this->model_catalog_product->getProduct($product_id);
-
-			$subject = sprintf($this->language->get('text_subject'), $this->config->get('config_name'));
-
-			$message  = $this->language->get('text_waiting') . "\n";
-			$message .= sprintf($this->language->get('text_product'), $this->db->escape(strip_tags($product_info['name']))) . "\n";
-			$message .= sprintf($this->language->get('text_reviewer'), $this->db->escape(strip_tags($data['name']))) . "\n";
-			$message .= sprintf($this->language->get('text_rating'), $this->db->escape(strip_tags($data['rating']))) . "\n";
-			$message .= $this->language->get('text_review') . "\n";
-			$message .= $this->db->escape(strip_tags($data['text'])) . "\n\n";
-
-			$mail = new Mail($this->config->get('config_mail'));
-			$mail->setTo(array($this->config->get('config_email')));
-			$mail->setFrom($this->config->get('config_email'));
-			$mail->setSender($this->config->get('config_name'));
-			$mail->setSubject($subject);
-			$mail->setText(html_entity_decode($message, ENT_QUOTES, 'UTF-8'));
-			$mail->send();
-
-			// Send to additional alert emails
-			$emails = explode(',', $this->config->get('config_mail_alert'));
-
-			foreach ($emails as $email) {
-				if ($email && preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $email)) {
-					$mail->setTo($email);
-					$mail->send();
-				}
-			}
-		}
-
-		$this->event->trigger('post.review.add', $review_id);
+		return $this->db->getLastId();
 	}
 
 	public function getReviewsByProductId($product_id, $start = 0, $limit = 20) {
